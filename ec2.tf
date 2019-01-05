@@ -92,24 +92,6 @@ data "aws_ami" "ubuntu" {
 
 # INSTANCES #
 
-resource "aws_instance" "bastion" {
-  ami                         = "${data.aws_ami.ubuntu.id}"
-  instance_type               = "t2.micro"
-  subnet_id                   = "${aws_subnet.pub_subnet.id}"
-  vpc_security_group_ids      = ["${aws_security_group.kibana-grafana-sg.id}"]
-  associate_public_ip_address = true
-  key_name                    = "${var.key_name}"
-  
-  connection {
-    user        = "ubuntu"
-    private_key = "${file(var.private_key_path)}"
-  }
-  
-  tags {
-    Name = "bastion"
-    }
-}
-
 resource "aws_instance" "elastic_search" {
   ami                         = "${data.aws_ami.ubuntu.id}"
   instance_type               = "t2.micro"
