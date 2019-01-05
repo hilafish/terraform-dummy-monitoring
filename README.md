@@ -10,12 +10,12 @@ How to use this repository and install a fully working environment with dummy ex
 
 3. terraform init (make sure you have terraform installed)
 
-4. terraform plan -var 'aws_access_key=access_key_here' -var 'aws_secret_key=secret_key_here' -var 'private_key_path=path_to_private_key_here' 
+4. terraform plan -var 'aws_access_key=access_key_here' -var 'aws_secret_key=secret_key_here' -var 'private_key_path=path_to_private_key_here' -var 'key_name=key_pair_name_here'
 
 (if you want to know what's going to be installed.. it's a good practice to run plan first)
 *** region = "us-east-1". If you would like to use other region, change it in the ec2.tf file.
 
-5. terraform apply -var 'aws_access_key=access_key_here' -var 'aws_secret_key=secret_key_here' -var 'private_key_path=path_to_private_key_here' --auto-approve
+5. terraform apply -var 'aws_access_key=access_key_here' -var 'aws_secret_key=secret_key_here' -var 'private_key_path=path_to_private_key_here' -var 'key_name=key_pair_name_here' --auto-approve
 
 *** Reminder: region = "us-east-1". If you would like to use other region, change it in the ec2.tf file.
 
@@ -23,7 +23,7 @@ How to use this repository and install a fully working environment with dummy ex
 
 7. Upon decision to remove the terraform managed resources created just now, run:
 
-terraform destroy -var 'aws_access_key=access_key_here' -var 'aws_secret_key=secret_key_here' -var 'private_key_path=path_to_private_key_here' --auto-approve
+terraform destroy -var 'aws_access_key=access_key_here' -var 'aws_secret_key=secret_key_here' -var 'private_key_path=path_to_private_key_here' -var 'key_name=key_pair_name_here' --auto-approve
 
 Once Terraform finished running, you should expect this output:
 Apply complete! Resources: 26 added, 0 changed, 0 destroyed.
