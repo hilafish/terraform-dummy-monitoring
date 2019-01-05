@@ -26,7 +26,8 @@ How to use this repository and install a fully working environment with dummy ex
 terraform destroy -var 'aws_access_key=access_key_here' -var 'aws_secret_key=secret_key_here' -var 'private_key_path=path_to_private_key_here' --auto-approve
 
 Once Terraform finished running, you should expect this output:
-Apply complete! Resources: 26 added, 0 changed, 0 destroyed.
+
+Apply complete! Resources: 25 added, 0 changed, 0 destroyed.
 
 Outputs:
 kibana_grafana_public_dns = ec2-3-84-131-190.compute-1.amazonaws.com (for example)
