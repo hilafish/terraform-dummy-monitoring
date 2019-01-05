@@ -19,11 +19,12 @@ resource "aws_security_group" "kibana-grafana-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
-    from_port   = 5601
-    to_port     = 5601
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  
   # outbound internet access
   egress {
     from_port   = 0
