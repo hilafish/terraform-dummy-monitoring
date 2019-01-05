@@ -7,7 +7,6 @@ variable "aws_secret_key" {}
 variable "private_key_path" {}
 variable "key_name" {}
 
-
 ##################################################################################
 # PROVIDERS
 ##################################################################################
@@ -27,10 +26,10 @@ data "template_file" "consul-client-userdata" {
 
   vars {
     elastic_search_private_ip = "${aws_instance.elastic_search.private_ip}"
-    CHECKPOINT_URL = "https://checkpoint-api.hashicorp.com/v1/check"
-    LOCAL_IPV4 = "$${LOCAL_IPV4}"
-    CONSUL_VERSION = "$${CONSUL_VERSION}"
-    DATACENTER_NAME = "OpsSchool"
+    CHECKPOINT_URL            = "https://checkpoint-api.hashicorp.com/v1/check"
+    LOCAL_IPV4                = "$${LOCAL_IPV4}"
+    CONSUL_VERSION            = "$${CONSUL_VERSION}"
+    DATACENTER_NAME           = "OpsSchool"
   }
 }
 
@@ -41,7 +40,6 @@ data "template_file" "kibana_config" {
     elastic_search_private_ip = "${aws_instance.elastic_search.private_ip}"
   }
 }
-
 
 data "template_file" "prometheus-userdata" {
   template = "${file("${path.module}/config/user-data/prometheus-userdata.sh.tpl")}"
@@ -61,7 +59,7 @@ data "template_file" "elasticsearch-userdata" {
 
 data "template_file" "prometheus_datasource" {
   template = "${file("${path.module}/config/grafana/prometheus_datasource.yaml.tpl")}"
-  
+
   vars {
     prometheus_private_ip = "${aws_instance.prometheus.private_ip}"
   }
@@ -86,16 +84,15 @@ data "aws_ami" "ubuntu" {
 # RESOURCES
 ##################################################################################
 
-
 # INSTANCES #
 
 resource "aws_instance" "elastic_search" {
-  ami                         = "${data.aws_ami.ubuntu.id}"
-  instance_type               = "t2.micro"
-  vpc_security_group_ids      = ["${aws_security_group.elastic-search-sg.id}"]
-  subnet_id                   = "${aws_subnet.priv_subnet.id}"
-  key_name                    = "${var.key_name}"
-  depends_on                  = ["aws_nat_gateway.NATGW-Virginia-VPC"]
+  ami                    = "${data.aws_ami.ubuntu.id}"
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = ["${aws_security_group.elastic-search-sg.id}"]
+  subnet_id              = "${aws_subnet.priv_subnet.id}"
+  key_name               = "${var.key_name}"
+  depends_on             = ["aws_nat_gateway.NATGW-Virginia-VPC"]
 
   connection {
     user        = "ubuntu"
@@ -105,19 +102,18 @@ resource "aws_instance" "elastic_search" {
   tags {
     Name = "elastic_search"
   }
-  
+
   user_data = "${data.template_file.elasticsearch-userdata.rendered}"
 }
 
-
 resource "aws_instance" "consul_server" {
-  ami                         = "${data.aws_ami.ubuntu.id}"
-  instance_type               = "t2.micro"
-  vpc_security_group_ids      = ["${aws_security_group.consul-sg.id}"]
-  key_name                    = "${var.key_name}"
-  subnet_id                   = "${aws_subnet.priv_subnet.id}"
-  iam_instance_profile        = "${aws_iam_instance_profile.consul-server-instance-profile.name}"
-  depends_on                  = ["aws_nat_gateway.NATGW-Virginia-VPC"]
+  ami                    = "${data.aws_ami.ubuntu.id}"
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = ["${aws_security_group.consul-sg.id}"]
+  key_name               = "${var.key_name}"
+  subnet_id              = "${aws_subnet.priv_subnet.id}"
+  iam_instance_profile   = "${aws_iam_instance_profile.consul-server-instance-profile.name}"
+  depends_on             = ["aws_nat_gateway.NATGW-Virginia-VPC"]
 
   connection {
     user        = "ubuntu"
@@ -131,14 +127,13 @@ resource "aws_instance" "consul_server" {
   user_data = "${file("${path.module}/config/user-data/consul-server-userdata.sh")}"
 }
 
-
 resource "aws_instance" "prometheus" {
-  ami                         = "${data.aws_ami.ubuntu.id}"
-  instance_type               = "t2.micro"
-  vpc_security_group_ids      = ["${aws_security_group.prometheus-sg.id}"]
-  key_name                    = "${var.key_name}"
-  subnet_id                   = "${aws_subnet.priv_subnet.id}"
-  depends_on                  = ["aws_instance.consul_server", "aws_nat_gateway.NATGW-Virginia-VPC"]
+  ami                    = "${data.aws_ami.ubuntu.id}"
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = ["${aws_security_group.prometheus-sg.id}"]
+  key_name               = "${var.key_name}"
+  subnet_id              = "${aws_subnet.priv_subnet.id}"
+  depends_on             = ["aws_instance.consul_server", "aws_nat_gateway.NATGW-Virginia-VPC"]
 
   connection {
     user        = "ubuntu"
@@ -148,10 +143,9 @@ resource "aws_instance" "prometheus" {
   tags {
     Name = "prometheus"
   }
-				 
+
   user_data = "${data.template_file.prometheus-userdata.rendered}"
 }
-
 
 resource "aws_instance" "kibana_grafana" {
   ami                         = "${data.aws_ami.ubuntu.id}"
@@ -160,7 +154,7 @@ resource "aws_instance" "kibana_grafana" {
   associate_public_ip_address = true
   key_name                    = "${var.key_name}"
   subnet_id                   = "${aws_subnet.pub_subnet.id}"
-  depends_on                  = ["aws_instance.elastic_search","aws_instance.kibana_grafana"]
+  depends_on                  = ["aws_instance.elastic_search", "aws_instance.kibana_grafana"]
 
   connection {
     user        = "ubuntu"
@@ -172,7 +166,7 @@ resource "aws_instance" "kibana_grafana" {
   }
 
   provisioner "file" {
-    content = "${data.template_file.kibana_config.rendered}"
+    content     = "${data.template_file.kibana_config.rendered}"
     destination = "/tmp/kibana.yml"
   }
 
@@ -180,17 +174,17 @@ resource "aws_instance" "kibana_grafana" {
     source      = "${path.module}/config/kibana/kibana_dashboard.json"
     destination = "/tmp/kibana_dashboard.json"
   }
-  
+
   provisioner "file" {
     content     = "${data.template_file.prometheus_datasource.rendered}"
     destination = "/tmp/prometheus_datasource.yaml"
-  }	
- 
- provisioner "file" {
+  }
+
+  provisioner "file" {
     source      = "${path.module}/config/grafana/prometheus_dashboards.yaml"
     destination = "/tmp/prometheus_dashboards.yaml"
   }
-  
+
   provisioner "file" {
     source      = "${path.module}/config/grafana/grafana_dashboard.json"
     destination = "/tmp/grafana_dashboard.json"
@@ -200,6 +194,7 @@ resource "aws_instance" "kibana_grafana" {
     inline = [
       # installing kibana & grafana
       "wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -",
+
       "echo \"deb https://artifacts.elastic.co/packages/6.x/apt stable main\" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list",
       "echo \"deb https://packagecloud.io/grafana/stable/debian/ stretch main\" | sudo tee -a /etc/apt/sources.list.d/grafana.list",
       "sudo curl https://packagecloud.io/gpg.key | sudo apt-key add -",
@@ -222,21 +217,20 @@ resource "aws_instance" "kibana_grafana" {
       "sudo systemctl start grafana-server",
       "sleep 30",
       "curl -f -XPOST -H 'Content-Type: application/json' -H 'kbn-xsrf: anything' 'http://${self.private_ip}:5601/api/saved_objects/index-pattern/filebeat-*' '-d{\"attributes\":{\"title\":\"filebeat-*\",\"timeFieldName\":\"@timestamp\"}}'",
-      "curl -u elastic:${aws_instance.elastic_search.private_ip} -k -XPOST 'http://${self.private_ip}:5601/api/kibana/dashboards/import' -H 'Content-Type: application/json' -H \"kbn-xsrf: true\" -d @/tmp/kibana_dashboard.json"
+      "curl -u elastic:${aws_instance.elastic_search.private_ip} -k -XPOST 'http://${self.private_ip}:5601/api/kibana/dashboards/import' -H 'Content-Type: application/json' -H \"kbn-xsrf: true\" -d @/tmp/kibana_dashboard.json",
     ]
   }
 }
 
-
 resource "aws_instance" "dummy_exporter" {
-  count                       = 2
-  ami                         = "${data.aws_ami.ubuntu.id}"
-  instance_type               = "t2.micro"
-  vpc_security_group_ids      = ["${aws_security_group.dummy-exporter-sg.id}"]
-  key_name                    = "${var.key_name}"
-  iam_instance_profile        = "${aws_iam_instance_profile.consul-server-instance-profile.name}"
-  subnet_id                   = "${aws_subnet.priv_subnet.id}"
-  depends_on                  = ["aws_instance.consul_server", "aws_nat_gateway.NATGW-Virginia-VPC"]
+  count                  = 2
+  ami                    = "${data.aws_ami.ubuntu.id}"
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = ["${aws_security_group.dummy-exporter-sg.id}"]
+  key_name               = "${var.key_name}"
+  iam_instance_profile   = "${aws_iam_instance_profile.consul-server-instance-profile.name}"
+  subnet_id              = "${aws_subnet.priv_subnet.id}"
+  depends_on             = ["aws_instance.consul_server", "aws_nat_gateway.NATGW-Virginia-VPC"]
 
   connection {
     user        = "ubuntu"
@@ -247,15 +241,12 @@ resource "aws_instance" "dummy_exporter" {
     Name = "dummy-exporter-${count.index + 1}"
   }
 
-
   user_data = "${data.template_file.consul-client-userdata.rendered}"
 }
-
 
 ##################################################################################
 # OUTPUT
 ##################################################################################
-
 
 output "kibana_grafana_public_dns" {
   value = "${aws_instance.kibana_grafana.public_dns}"
