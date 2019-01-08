@@ -199,7 +199,7 @@ resource "aws_instance" "kibana_grafana" {
       "echo \"deb https://packagecloud.io/grafana/stable/debian/ stretch main\" | sudo tee -a /etc/apt/sources.list.d/grafana.list",
       "sudo curl https://packagecloud.io/gpg.key | sudo apt-key add -",
       "sudo apt-get update",
-      "sudo apt-get install -y kibana grafana",
+      "sudo apt-get install -y --allow-unauthenticated kibana grafana",
       "sudo mv /tmp/kibana.yml /etc/kibana/",
       "sudo sed -i \"s/#server.host: \\\"localhost\\\"/server.host: \\\"${self.private_ip}\\\"/g\" /etc/kibana/kibana.yml",
       "sudo systemctl daemon-reload",
