@@ -2,10 +2,25 @@
 # VARIABLES
 ##################################################################################
 
-variable "aws_access_key" {}
-variable "aws_secret_key" {}
-variable "private_key_path" {}
-variable "key_name" {}
+variable "aws_access_key" {
+    default = "<your_aws_access_key>"
+}
+
+variable "aws_secret_key" {
+    default = "<your_aws_secret_key>"
+} 
+
+variable "aws_private_key_path" {
+    default = "<your_aws_private_key_path>"
+}
+
+variable "aws_key_name" {
+    default = "<your_aws_key_name>"
+}
+
+variable "aws_region" {
+    default = "us-east-1"
+}
 
 ##################################################################################
 # PROVIDERS
@@ -14,7 +29,7 @@ variable "key_name" {}
 provider "aws" {
   access_key = "${var.aws_access_key}"
   secret_key = "${var.aws_secret_key}"
-  region     = "us-east-1"
+  region     = "${var.aws_region}"
 }
 
 ##################################################################################
@@ -91,33 +106,33 @@ resource "aws_instance" "elastic_search" {
   instance_type          = "t2.micro"
   vpc_security_group_ids = ["${aws_security_group.elastic-search-sg.id}"]
   subnet_id              = "${aws_subnet.priv_subnet.id}"
-  key_name               = "${var.key_name}"
+  key_name               = "${var.aws_key_name}"
   depends_on             = ["aws_nat_gateway.NATGW-Virginia-VPC"]
 
   connection {
     user        = "ubuntu"
-    private_key = "${file(var.private_key_path)}"
+    private_key = "${file(var.aws_private_key_path)}"
   }
 
   tags {
     Name = "elastic_search"
   }
 
-  user_data = "${data.template_file.elasticsearch-userdata.rendered}"
+    user_data = "${data.template_file.elasticsearch-userdata.rendered}"
 }
 
 resource "aws_instance" "consul_server" {
   ami                    = "${data.aws_ami.ubuntu.id}"
   instance_type          = "t2.micro"
   vpc_security_group_ids = ["${aws_security_group.consul-sg.id}"]
-  key_name               = "${var.key_name}"
+  key_name               = "${var.aws_key_name}"
   subnet_id              = "${aws_subnet.priv_subnet.id}"
   iam_instance_profile   = "${aws_iam_instance_profile.consul-server-instance-profile.name}"
   depends_on             = ["aws_nat_gateway.NATGW-Virginia-VPC"]
 
   connection {
     user        = "ubuntu"
-    private_key = "${file(var.private_key_path)}"
+    private_key = "${file(var.aws_private_key_path)}"
   }
 
   tags {
@@ -131,13 +146,13 @@ resource "aws_instance" "prometheus" {
   ami                    = "${data.aws_ami.ubuntu.id}"
   instance_type          = "t2.micro"
   vpc_security_group_ids = ["${aws_security_group.prometheus-sg.id}"]
-  key_name               = "${var.key_name}"
+  key_name               = "${var.aws_key_name}"
   subnet_id              = "${aws_subnet.priv_subnet.id}"
   depends_on             = ["aws_instance.consul_server", "aws_nat_gateway.NATGW-Virginia-VPC"]
 
   connection {
     user        = "ubuntu"
-    private_key = "${file(var.private_key_path)}"
+    private_key = "${file(var.aws_private_key_path)}"
   }
 
   tags {
@@ -152,13 +167,13 @@ resource "aws_instance" "kibana_grafana" {
   instance_type               = "t2.micro"
   vpc_security_group_ids      = ["${aws_security_group.kibana-grafana-sg.id}"]
   associate_public_ip_address = true
-  key_name                    = "${var.key_name}"
+  key_name                    = "${var.aws_key_name}"
   subnet_id                   = "${aws_subnet.pub_subnet.id}"
   depends_on                  = ["aws_instance.elastic_search", "aws_instance.kibana_grafana"]
 
   connection {
     user        = "ubuntu"
-    private_key = "${file(var.private_key_path)}"
+    private_key = "${file(var.aws_private_key_path)}"
   }
 
   tags {
@@ -227,14 +242,14 @@ resource "aws_instance" "dummy_exporter" {
   ami                    = "${data.aws_ami.ubuntu.id}"
   instance_type          = "t2.micro"
   vpc_security_group_ids = ["${aws_security_group.dummy-exporter-sg.id}"]
-  key_name               = "${var.key_name}"
+  key_name               = "${var.aws_key_name}"
   iam_instance_profile   = "${aws_iam_instance_profile.consul-server-instance-profile.name}"
   subnet_id              = "${aws_subnet.priv_subnet.id}"
   depends_on             = ["aws_instance.consul_server", "aws_nat_gateway.NATGW-Virginia-VPC"]
 
   connection {
     user        = "ubuntu"
-    private_key = "${file(var.private_key_path)}"
+    private_key = "${file(var.aws_private_key_path)}"
   }
 
   tags {
