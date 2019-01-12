@@ -209,7 +209,6 @@ resource "aws_instance" "kibana_grafana" {
     inline = [
       # installing kibana & grafana
       "wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -",
-
       "echo \"deb https://artifacts.elastic.co/packages/6.x/apt stable main\" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list",
       "echo \"deb https://packagecloud.io/grafana/stable/debian/ stretch main\" | sudo tee -a /etc/apt/sources.list.d/grafana.list",
       "sudo curl https://packagecloud.io/gpg.key | sudo apt-key add -",
