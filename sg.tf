@@ -2,7 +2,7 @@
 
 resource "aws_security_group" "kibana-grafana-sg" {
   name   = "kibana_grafana_sg"
-  vpc_id = "${aws_vpc.Virginia-VPC.id}"
+  vpc_id = "${aws_vpc.Custom-VPC.id}"
 
   # access from anywhere
 
@@ -36,21 +36,21 @@ resource "aws_security_group" "kibana-grafana-sg" {
 
 resource "aws_security_group" "prometheus-sg" {
   name   = "prometheus_sg"
-  vpc_id = "${aws_vpc.Virginia-VPC.id}"
+  vpc_id = "${aws_vpc.Custom-VPC.id}"
 
   # access from anywhere
   ingress {
     from_port   = 9090
     to_port     = 9100
     protocol    = "tcp"
-    cidr_blocks = ["${var.Virginia-VPC_address_space}"]
+    cidr_blocks = ["${var.Custom-VPC_address_space}"]
   }
 
   ingress {
     from_port   = 8300
     to_port     = 8600
     protocol    = "tcp"
-    cidr_blocks = ["${var.Virginia-VPC_address_space}"]
+    cidr_blocks = ["${var.Custom-VPC_address_space}"]
   }
 
   # outbound internet access
@@ -64,21 +64,21 @@ resource "aws_security_group" "prometheus-sg" {
 
 resource "aws_security_group" "dummy-exporter-sg" {
   name   = "dummy_exporter_sg"
-  vpc_id = "${aws_vpc.Virginia-VPC.id}"
+  vpc_id = "${aws_vpc.Custom-VPC.id}"
 
   # access from anywhere
   ingress {
     from_port   = 65433
     to_port     = 65433
     protocol    = "tcp"
-    cidr_blocks = ["${var.Virginia-VPC_address_space}"]
+    cidr_blocks = ["${var.Custom-VPC_address_space}"]
   }
 
   ingress {
     from_port   = 8300
     to_port     = 8600
     protocol    = "tcp"
-    cidr_blocks = ["${var.Virginia-VPC_address_space}"]
+    cidr_blocks = ["${var.Custom-VPC_address_space}"]
   }
 
   # outbound internet access
@@ -92,7 +92,7 @@ resource "aws_security_group" "dummy-exporter-sg" {
 
 resource "aws_security_group" "consul-sg" {
   name   = "consul_sg"
-  vpc_id = "${aws_vpc.Virginia-VPC.id}"
+  vpc_id = "${aws_vpc.Custom-VPC.id}"
 
   # access from anywhere
 
@@ -100,7 +100,7 @@ resource "aws_security_group" "consul-sg" {
     from_port   = 8300
     to_port     = 8600
     protocol    = "tcp"
-    cidr_blocks = ["${var.Virginia-VPC_address_space}"]
+    cidr_blocks = ["${var.Custom-VPC_address_space}"]
   }
   # outbound internet access
   egress {
@@ -113,14 +113,14 @@ resource "aws_security_group" "consul-sg" {
 
 resource "aws_security_group" "elastic-search-sg" {
   name   = "elastic_search_sg"
-  vpc_id = "${aws_vpc.Virginia-VPC.id}"
+  vpc_id = "${aws_vpc.Custom-VPC.id}"
 
   # access from anywhere
   ingress {
     from_port   = 9200
     to_port     = 9200
     protocol    = "tcp"
-    cidr_blocks = ["${var.Virginia-VPC_address_space}"]
+    cidr_blocks = ["${var.Custom-VPC_address_space}"]
   }
 
   # outbound internet access

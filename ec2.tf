@@ -19,7 +19,7 @@ variable "aws_key_name" {
 }
 
 variable "aws_region" {
-    default = "us-east-1"
+    default = "us-east-2"
 }
 
 ##################################################################################
@@ -107,7 +107,7 @@ resource "aws_instance" "elastic_search" {
   vpc_security_group_ids = ["${aws_security_group.elastic-search-sg.id}"]
   subnet_id              = "${aws_subnet.priv_subnet.id}"
   key_name               = "${var.aws_key_name}"
-  depends_on             = ["aws_nat_gateway.NATGW-Virginia-VPC"]
+  depends_on             = ["aws_nat_gateway.NATGW-Custom-VPC"]
 
   connection {
     user        = "ubuntu"
@@ -128,7 +128,7 @@ resource "aws_instance" "consul_server" {
   key_name               = "${var.aws_key_name}"
   subnet_id              = "${aws_subnet.priv_subnet.id}"
   iam_instance_profile   = "${aws_iam_instance_profile.consul-server-instance-profile.name}"
-  depends_on             = ["aws_nat_gateway.NATGW-Virginia-VPC"]
+  depends_on             = ["aws_nat_gateway.NATGW-Custom-VPC"]
 
   connection {
     user        = "ubuntu"
@@ -148,7 +148,7 @@ resource "aws_instance" "prometheus" {
   vpc_security_group_ids = ["${aws_security_group.prometheus-sg.id}"]
   key_name               = "${var.aws_key_name}"
   subnet_id              = "${aws_subnet.priv_subnet.id}"
-  depends_on             = ["aws_instance.consul_server", "aws_nat_gateway.NATGW-Virginia-VPC"]
+  depends_on             = ["aws_instance.consul_server", "aws_nat_gateway.NATGW-Custom-VPC"]
 
   connection {
     user        = "ubuntu"
@@ -244,7 +244,7 @@ resource "aws_instance" "dummy_exporter" {
   key_name               = "${var.aws_key_name}"
   iam_instance_profile   = "${aws_iam_instance_profile.consul-server-instance-profile.name}"
   subnet_id              = "${aws_subnet.priv_subnet.id}"
-  depends_on             = ["aws_instance.consul_server", "aws_nat_gateway.NATGW-Virginia-VPC"]
+  depends_on             = ["aws_instance.consul_server", "aws_nat_gateway.NATGW-Custom-VPC"]
 
   connection {
     user        = "ubuntu"

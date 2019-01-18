@@ -15,8 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
-  "iteration": 1546621460231,
+  "iteration": 1547841538226,
   "links": [],
   "panels": [
     {
@@ -28,12 +27,13 @@
       "fill": 1,
       "gridPos": {
         "h": 7,
-        "w": 7,
+        "w": 8,
         "x": 0,
         "y": 0
       },
       "id": 3,
       "legend": {
+        "alignAsTable": false,
         "avg": false,
         "current": false,
         "max": false,
@@ -54,22 +54,23 @@
       "repeatDirection": "h",
       "seriesOverrides": [],
       "spaceLength": 10,
-      "stack": false,
+      "stack": true,
       "steppedLine": false,
       "targets": [
         {
-          "expr": "DummyService_duration_cumulative_bucket{app=\"dummy-exporter\",instance=~\"$instance\",job=\"consul_services\",le=~\"$le\",process_id=\"$process_id\",process_name=\"my_dummy_exporter.py\",service=\"dummy_exporter\"}",
+          "expr": "histogram_quantile(0.99, sum(rate(DummyService_duration_cumulative_bucket[5m])) by (le, instance))",
           "format": "time_series",
+          "hide": false,
           "intervalFactor": 1,
           "legendFormat": "{{instance}}",
-          "refId": "A"
+          "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "DummyService_duration_cumulative_bucket",
+      "title": "Duration_cumulative_bucket - 99th percentile aggregation",
       "tooltip": {
         "shared": false,
         "sort": 0,
@@ -117,8 +118,8 @@
       "fill": 1,
       "gridPos": {
         "h": 7,
-        "w": 9,
-        "x": 7,
+        "w": 8,
+        "x": 8,
         "y": 0
       },
       "id": 6,
@@ -127,7 +128,7 @@
         "current": false,
         "max": false,
         "min": false,
-        "rightSide": true,
+        "rightSide": false,
         "show": true,
         "total": false,
         "values": false
@@ -147,23 +148,25 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "DummyService_requests{app=\"dummy-exporter\",caller=\"APT\",instance=~\"$instance\",job=\"consul_services\",process_id=\"$process_id\",process_name=\"my_dummy_exporter.py\",service=\"dummy_exporter\"}\t",
+          "expr": "rate(DummyService_requests{app=\"dummy-exporter\",caller=\"APT\",instance=~\"$instance\",job=\"consul_services\",process_id=\"$process_id\",process_name=\"my_dummy_exporter.py\",service=\"dummy_exporter\"}\t[1m] offset 1m)",
           "format": "time_series",
+          "hide": false,
           "intervalFactor": 1,
           "legendFormat": "{{instance}}",
-          "refId": "A"
+          "refId": "C"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "DummyService_requests",
+      "title": "DummyService_requests (1m)",
       "tooltip": {
         "shared": true,
         "sort": 0,
         "value_type": "individual"
       },
+      "transparent": false,
       "type": "graph",
       "xaxis": {
         "buckets": null,
@@ -197,7 +200,7 @@
     },
     {
       "aliasColors": {},
-      "bars": true,
+      "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
@@ -208,18 +211,17 @@
         "x": 16,
         "y": 0
       },
-      "id": 5,
+      "id": 8,
       "legend": {
         "avg": false,
         "current": false,
         "max": false,
         "min": false,
-        "rightSide": true,
-        "show": false,
+        "show": true,
         "total": false,
         "values": false
       },
-      "lines": false,
+      "lines": true,
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
@@ -227,6 +229,7 @@
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
+      "repeat": null,
       "repeatDirection": "h",
       "seriesOverrides": [],
       "spaceLength": 10,
@@ -234,10 +237,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "DummyService_errors{app=\"dummy-exporter\",instance=~\"$instance\",job=\"consul_services\",process_id=\"$process_id\",process_name=\"my_dummy_exporter.py\",service=\"dummy_exporter\"}\t",
+          "expr": "rate(DummyService_errors{app=\"dummy-exporter\",instance=~\"$instance\",job=\"consul_services\",process_id=\"$process_id\",process_name=\"my_dummy_exporter.py\",service=\"dummy_exporter\"} [1m])",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{instance}}",
+          "legendFormat": "{{ instance }}",
           "refId": "A"
         }
       ],
@@ -245,26 +248,24 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "DummyService_errors",
+      "title": "DummyService_Errors (1m)",
       "tooltip": {
-        "shared": false,
+        "shared": true,
         "sort": 0,
         "value_type": "individual"
       },
       "type": "graph",
       "xaxis": {
         "buckets": null,
-        "mode": "series",
+        "mode": "time",
         "name": null,
         "show": true,
-        "values": [
-          "current"
-        ]
+        "values": []
       },
       "yaxes": [
         {
           "format": "short",
-          "label": "",
+          "label": null,
           "logBase": 1,
           "max": null,
           "min": null,
@@ -324,11 +325,20 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "DummyService_duration_summary{app=\"dummy-exporter\",instance=~\"$instance\",job=\"consul_services\",process_id=\"$process_id\",process_name=\"my_dummy_exporter.py\",quantile=~\"$quantile\",service=\"dummy_exporter\"}",
+          "expr": "sum(DummyService_duration_summary{app=\"dummy-exporter\",instance=~\"$instance\",job=\"consul_services\",process_id=\"$process_id\",process_name=\"my_dummy_exporter.py\",quantile=~\"$quantile\",service=\"dummy_exporter\"}) by (instance)",
           "format": "time_series",
+          "hide": false,
           "intervalFactor": 1,
           "legendFormat": "{{instance}}",
           "refId": "A"
+        },
+        {
+          "expr": "avg(rate(DummyService_duration_summary[5m])) by (instance)",
+          "format": "time_series",
+          "hide": true,
+          "intervalFactor": 1,
+          "legendFormat": "{{instance}}",
+          "refId": "B"
         }
       ],
       "thresholds": [],
@@ -411,7 +421,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "DummyService_duration_non_cumulative_bucket{app=\"dummy-exporter\",instance=~\"$instance\",job=\"consul_services\",le=~\"$le\",process_id=\"$process_id\",process_name=\"my_dummy_exporter.py\",service=\"dummy_exporter\"}\t",
+          "expr": "round(DummyService_duration_non_cumulative_bucket{app=\"dummy-exporter\",instance=~\"$instance\",job=\"consul_services\",le=~\"$le\",process_id=\"$process_id\",process_name=\"my_dummy_exporter.py\",service=\"dummy_exporter\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{instance}}",
@@ -460,6 +470,7 @@
       }
     }
   ],
+  "refresh": false,
   "schemaVersion": 16,
   "style": "dark",
   "tags": [],
@@ -496,7 +507,7 @@
           {
             "selected": false,
             "text": "Dummy-Exporter-2",
-            "value": "dummy-exporter-2"
+            "value": "dummy-exporter-1"
           }
         ],
         "query": "label_values(instance)",
@@ -514,8 +525,11 @@
         "allValue": null,
         "current": {
           "selected": true,
+          "tags": [],
           "text": "0.5",
-          "value": "0.5"
+          "value": [
+            "0.5"
+          ]
         },
         "datasource": "Prometheus",
         "definition": "label_values(quantile)",
@@ -609,8 +623,8 @@
         "current": {
           "selected": true,
           "tags": [],
-          "text": "20.0",
-          "value": "20.0"
+          "text": "90.0",
+          "value": "90.0"
         },
         "datasource": "Prometheus",
         "definition": "label_values(le)",
@@ -631,7 +645,7 @@
             "value": "10.0"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "20.0",
             "value": "20.0"
           },
@@ -666,7 +680,7 @@
             "value": "80.0"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "90.0",
             "value": "90.0"
           }
@@ -685,7 +699,7 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
@@ -716,5 +730,5 @@
   "timezone": "",
   "title": "dummy_exporter_dashboard",
   "uid": "DdaHJo8mk",
-  "version": 12
+  "version": 1
 }
