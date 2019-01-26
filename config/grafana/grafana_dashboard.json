@@ -507,7 +507,7 @@
           {
             "selected": false,
             "text": "Dummy-Exporter-2",
-            "value": "dummy-exporter-1"
+            "value": "dummy-exporter-2"
           }
         ],
         "query": "label_values(instance)",
